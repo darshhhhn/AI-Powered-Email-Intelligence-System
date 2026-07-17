@@ -1,0 +1,43 @@
+{% extends "mail_app/base.html" %}
+
+{% block title %}Sign in · Mail Viewer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm border-0 mv-card">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h4 mb-3 text-center">Sign in with IMAP</h1>
+        <p class="text-muted small text-center mb-4">
+          Your password is checked against Gmail’s IMAP server and kept only in your session
+          (not in our database). Use an <strong>App Password</strong> if 2-Step Verification is on.
+        </p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="invalid-feedback d-block">{{ form.password.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2">Connect inbox</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-center text-muted small mt-3 mb-0">
+      Host: <code>imap.gmail.com</code> · Port: <code>993</code> (SSL)
+    </p>
+  </div>
+</div>
+{% endblock %}

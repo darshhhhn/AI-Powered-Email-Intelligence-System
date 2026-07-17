@@ -1,0 +1,188 @@
+{% extends "mail_app/base.html" %}
+
+{% block title %}AI Analysis{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">AI Email Analysis</h2>
+
+    {% if analysis_type == "thread" %}
+    <div class="mb-4">
+        <a href="{% url 'mail_app:generate_pdf' %}" class="btn btn-danger">
+            Generate PDF Report
+        </a>
+
+        <a href="{% url 'mail_app:dashboard' %}" class="btn btn-secondary">
+            Back to Inbox
+        </a>
+    </div>
+    {% endif %}
+
+    {% if analysis_type == "clusters" %}
+
+        {% for cluster in analysis.clusters %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                {{ cluster.topic }}
+            </div>
+
+            <div class="card-body">
+
+                <h5>Participants</h5>
+                <ul>
+                    {% for p in cluster.participants %}
+                    <li>{{ p }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h5>Discussion Summary</h5>
+                <ul>
+                    {% for item in cluster.summary %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h5>Priority</h5>
+                <span class="badge bg-warning text-dark">
+                    {{ cluster.priority }}
+                </span>
+
+                <hr>
+
+                <h5>Recommendation</h5>
+                <div class="alert alert-success">
+                    {{ cluster.recommendation }}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    {% elif analysis_type == "thread" %}
+
+        <div class="card shadow-lg">
+
+            <div class="card-header bg-success text-white">
+                Thread Summary
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-bordered mb-4">
+                    <tr>
+                        <th>Date</th>
+                        <td><span class="formatted-date" data-dt="{{ analysis.thread_start }}"></span></td>
+                    </tr>
+                    <tr>
+                        <th>Time</th>
+                        <td><span class="formatted-time" data-dt="{{ analysis.thread_start }}"></span></td>
+                    </tr>
+                </table>
+
+                <table class="table table-bordered mb-4">
+                    <tr>
+                        <th>Date</th>
+                        <td><span class="formatted-date" data-dt="{{ analysis.thread_end }}"></span></td>
+                    </tr>
+                    <tr>
+                        <th>Time</th>
+                        <td><span class="formatted-time" data-dt="{{ analysis.thread_end }}"></span></td>
+                    </tr>
+                </table>
+
+                <h5>Participants</h5>
+
+                <table class="table table-striped mb-4">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in analysis.participants %}
+                        <tr>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.email }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h5>Discussion Summary</h5>
+
+                <ul class="list-group mb-4">
+                    {% for item in analysis.discussion_summary %}
+                    <li class="list-group-item">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h5>Further Actions</h5>
+
+                <ul class="list-group mb-4">
+                    {% for item in analysis.further_actions %}
+                    <li class="list-group-item">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h5>Recommendation</h5>
+
+                <div class="alert alert-info">
+                    {{ analysis.recommendation }}
+                </div>
+
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+function formatDateTime() {
+    const now = new Date();
+
+    document.querySelectorAll(".formatted-date").forEach(el => {
+        const raw = el.dataset.dt;
+
+        if (!raw || raw === "Unknown") {
+            el.innerText = raw || "Unknown";
+            return;
+        }
+
+        const dt = new Date(raw);
+        const diffDays = Math.floor((now - dt) / (1000 * 60 * 60 * 24));
+        const weekday = dt.toLocaleDateString("en-IN", { weekday: "long" });
+        const date = dt.toLocaleDateString("en-GB");
+
+        if (diffDays < 7) {
+            el.innerText = `${date} (${diffDays} day${diffDays !== 1 ? "s" : ""} ago), ${weekday}`;
+        } else {
+            el.innerText = `${date}, ${weekday}`;
+        }
+    });
+
+    document.querySelectorAll(".formatted-time").forEach(el => {
+        const raw = el.dataset.dt;
+
+        if (!raw || raw === "Unknown") {
+            el.innerText = raw || "Unknown";
+            return;
+        }
+
+        const dt = new Date(raw);
+
+        el.innerText = dt.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+    });
+}
+
+formatDateTime();
+</script>
+
+{% endblock %}

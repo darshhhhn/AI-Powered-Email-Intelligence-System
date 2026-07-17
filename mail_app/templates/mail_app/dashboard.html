@@ -1,0 +1,120 @@
+{% extends "mail_app/base.html" %}
+
+{% block title %}Inbox{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Inbox</h2>
+
+    <form
+        method="GET"
+        action="{% url 'mail_app:search' %}"
+        class="mb-4 position-relative"
+    >
+        <div class="input-group">
+            <input
+                type="text"
+                id="search-box"
+                name="q"
+                class="form-control"
+                placeholder="Search emails..."
+                autocomplete="off"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Search
+            </button>
+        </div>
+
+        <div
+            id="suggestions"
+            class="list-group position-absolute w-100 shadow"
+            style="z-index: 1000;"
+        ></div>
+    </form>
+
+    <div class="mb-4">
+        <a href="{% url 'mail_app:sync_mails' %}" class="btn btn-primary">
+            Refresh Inbox
+        </a>
+
+        <a href="{% url 'mail_app:analyze' %}" class="btn btn-success">
+            Analyze Conversations
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            Emails ({{ total_fetched }})
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>From</th>
+                        <th>Subject</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in emails %}
+                    <tr>
+                        <td>{{ row.email_date }}</td>
+                        <td>{{ row.sender }}</td>
+                        <td>{{ row.subject }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">
+                            No emails found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const box = document.getElementById("search-box");
+const suggestions = document.getElementById("suggestions");
+
+let timer;
+
+box.addEventListener("input", () => {
+    clearTimeout(timer);
+
+    const query = box.value.trim();
+
+    if (!query) {
+        suggestions.innerHTML = "";
+        return;
+    }
+
+    timer = setTimeout(async () => {
+        const res = await fetch(`/search-suggestions/?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        suggestions.innerHTML = "";
+
+        data.forEach(item => {
+            const btn = document.createElement("a");
+            btn.href = `/search/?email_id=${item.id}`;
+            btn.className = "list-group-item list-group-item-action";
+            btn.textContent = item.subject;
+            suggestions.appendChild(btn);
+        });
+    }, 400);
+});
+</script>
+
+{% endblock %}

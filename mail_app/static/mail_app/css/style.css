@@ -1,0 +1,23 @@
+/* Mail Viewer — small tweaks on top of Bootstrap 5 */
+
+.mv-card {
+  border-radius: 1rem;
+}
+
+.mv-table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+}
+
+.mv-cell-sender {
+  max-width: 14rem;
+  word-break: break-word;
+}
+
+.mv-preview {
+  max-width: 28rem;
+  white-space: normal;
+  line-height: 1.35;
+}
