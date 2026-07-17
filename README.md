@@ -13,7 +13,10 @@ An AI-powered email management platform built using Django and Python.
 - Timeline Extraction
 - Recommendation Generation
 - Professional PDF Report Generation
-
+![Login](screenshots/login.png)
+![Inbox](screenshots/inbox.png)
+![Search Results](screenshots/search_results.png)
+![Summary](screenshots/summary.png)
 ## Technologies
 
 - Python
